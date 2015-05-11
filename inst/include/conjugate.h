@@ -1,52 +1,23 @@
 #ifndef __CONJUGATE
 #define __CONJUGATE
 
-#define LOG_2_PI 1.837877066409345339082 // log(2*pi)
-#define LOG_2 0.69314718056
-#define LOG_PI_4 0.28618247146 // log(pi)/4
-#define LOG_PI 1.1447298858494001639 // log(pi)
-
 #include <mb_base.h>
 #include <except.h>
 #include <utilfuncs.h>
 #include <Eigen/Core>
-#include <Eigen/Sparse>
-#include <Eigen/Cholesky>
-#include <cppad_atomics.h>
-#include <functional>
-//#include <Distributions/MVN_AD.cpp>
-//#include <Distributions/wish_AD.cpp>
-
-
 
 using Eigen::Matrix;
-using Eigen::Array;
 using Eigen::MatrixBase;
 using Eigen::Dynamic;
-using Eigen::SparseMatrix;
-using Eigen::LLT;
-using Eigen::LDLT;
-using Eigen::Success;
 using Eigen::Block;
 using Eigen::Map;
-using Eigen::DiagonalMatrix;
-using Eigen::Upper;
-using Eigen::Lower;
-using Eigen::VectorXi;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
-using std::cout;
-using std::endl;
-
 
 template<typename T>
 bool my_finite(const T& x) {
   return( (abs(x) <= __DBL_MAX__ ) && ( x == x ) );
 }
-
-
-
-
 
 class conjugate  {
 
@@ -54,9 +25,6 @@ class conjugate  {
 
   typedef Matrix<AScalar, Dynamic, Dynamic> MatrixXA;
   typedef Matrix<AScalar, Dynamic, 1> VectorXA;
-  typedef Matrix<AScalar, 1, Dynamic> RowVectorXA;
-  typedef SparseMatrix<AScalar> SparseMatrixXA;
-  typedef Array<AScalar, Dynamic, Dynamic> ArrayXA;
 
  public:
   
@@ -121,19 +89,10 @@ class conjugate  {
 conjugate::conjugate(const List& params)
 {
 
-  using Rcpp::List;
-  using Rcpp::NumericMatrix;
-  using Rcpp::NumericVector;
-  using Rcpp::IntegerVector;
-  using Rcpp::as;
-  using Eigen::MatrixXd;
-  using Eigen::Map;
-  using std::cout;
-  using std::endl;
 
   List & pars = static_cast<List &>(const_cast<List &>(params));
 
-  List data = as<List>(pars["data"]);
+  List data = Rcpp::as<List>(pars["data"]);
   
   // Map R to Rcpp
   NumericMatrix Y_((SEXP)data["Y"]); // N x T
@@ -169,12 +128,7 @@ void conjugate::unwrap_params(const MatrixBase<Tpars>& P)
 
 template<typename Tpars>
 AScalar conjugate::eval_f(const MatrixBase<Tpars>& P) {
-  
-  using Eigen::Lower;
-  using std::cout;
-  using std::endl;
-  using Eigen::Block;
-  using Eigen::Map;
+
 
   unwrap_params(P);
 
@@ -196,7 +150,7 @@ void conjugate::eval_LLi(const MatrixBase<TL>& LLi_)
 
   MatrixBase<TL>& LLi = const_cast<MatrixBase<TL>& >(LLi_);
 
-  LLi.setConstant(-T*(log_sig + 0.5*LOG_2_PI));
+  LLi.setConstant(-T*(log_sig + M_LN_SQRT_2PI));
 
   MatrixXA Z = (Y.colwise() - theta).cwiseAbs2();
   Z.array() = 0.5 * Z.array() / s2;
@@ -220,7 +174,7 @@ void conjugate::eval_prior_i(const MatrixBase<TL>& prior_i_) {
   
   MatrixBase<TL>& prior_i = const_cast<MatrixBase<TL>& >(prior_i_);
 
-  prior_i.setConstant(-log_tau-0.5*LOG_2_PI);
+  prior_i.setConstant(-log_tau - M_LN_SQRT_2PI);
   prior_i.array() -= 0.5 * (theta.array()-mu).square()/t2;
 
 }
