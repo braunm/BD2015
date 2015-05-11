@@ -1,0 +1,2 @@
+PKG_CPPFLAGS=-DNDEBUG -I/opt/cppad-devel/include  -I../inst/include 
+CXX_STD = CXX11

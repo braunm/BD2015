@@ -1,0 +1,19 @@
+Package: BD2015
+Title: Replication files for Braun and Damien (2015) Scalable Rejection Sampling for Bayesian Hierarchical Models
+Version: 0.0.0.9000
+Authors@R: person(family="Braun", given="Michael", role=c("aut","cre","cph"), email="braunm@smu.edu")
+Description: This package contains replication files for Braun and Damien (2015) "Scalable Rejection Sampling for Bayesian Hierarchical Models," Marketing Science.
+Depends: R (>= 3.2.0),
+	 bayesGDS (>= 0.6.1),
+	 trustOptim (>= 0.8.5),
+	 sparseMVN (>= 0.2.0),
+	 methods,
+	 CppADutils
+Suggests:  testthat, knitr
+Roxygen: list(wrap=TRUE)
+License: file LICENSE
+LazyData: true
+LinkingTo: Rcpp, RcppEigen (>= 0.3.2.4), CppADutils
+VignetteBuilder: knitr
+SystemRequirements: C++11
+
