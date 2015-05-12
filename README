@@ -1,0 +1,41 @@
+The BD2015 package complements the article:
+
+Braun, Michael and Paul Damien (2015).  Scalable Rejection Sampling for
+Bayesian Hierarchical Models.  Marketing Science.  Articles in
+Advance. DOI:  10.1287/mksc.2014.0901
+
+The following files run the BD algorithm for the examples in the
+paper.  All files can be found in the inst/examples directory.
+
+f1
+f2
+f3
+
+The bayesGDS package is the most up-to-date source of code for the BD
+algorithm, and is actively improved and maintained.  That package
+provides additional documentation, vignettes and examples.  This
+package (BD2015) is no longer supported or maintained, but was provided
+at the request of the journal.
+
+Again, if you want to learn more about about to implement the BD
+algorithm, you should refer to the bayesGDS package, and the
+associated documentation, vignettes and examples.
+
+See the LICENSE, DESCRIPTION and COPYRIGHTS files more information about usage
+permissions and copyright ownership.
+
+Installation:
+
+The models in the BD2015 package were written in C++, using the CppAD
+automatic differentiation library.  CppAD is not available as an R
+package, so it needs to be downloaded and installed separately.
+Another requirement is the CppADutils R package.  CppADutils is not
+available on CRAN, but it can be downloaded and installed from
+www.github.com/braunm.
+
+CppADutils assumes that CppAD is installed in the /opt/cppad
+directory.  If CppAD is installed in another directory, the
+src/Makevars files in CppADutils will have to be changed before
+installing it.
+
+Other dependencies are listed in the DESCRIPTION file.
