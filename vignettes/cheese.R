@@ -11,10 +11,9 @@ set.seed(123)
 
 registerDoParallel(cores=10)
 
-
-
 data(cheese)
 x <- cheese
+
 colnames(x) <- c("Retailer","Volume","Disp","Price")
 x <- transform(x,RetID=as.integer(Retailer))
 x2 <- ddply(x,"RetID",function(j) subset(transform(j,week=1:length(j$Disp)),
@@ -68,21 +67,27 @@ control.list <- list(start.trust.radius=5,
 
 nvars <- N*k + k + N + k*(k+1)/2
 
+chol.G.start <- t(chol(diag(k)))
+vech.chol.G.start <- t( t( chol.G.start[!upper.tri(chol.G.start)] ) )
+
 start.list <- as.relistable(list(beta=matrix(0,k,N),
                                  log_alpha= rep(0,N),
                                  mu= rep(0,k),
-                                 chol.G=diag(k)
+                                 chol.G=vech.chol.G.start
                                  )
                             )
 
 start <- unlist(start.list)
-cl <- new("conjugate", L)
+cl <- new("cheese", L)
+
+print("Recording tape")
 cl$record.tape(start)
 cl$init.hessian(start)
 
 get.f <- function(P) return(cl$get.f(P))
 get.df <- function(P) return(cl$get.fdf(P)$grad)
 get.fdf <- function(P) return(cl$get.fdf(P))
+print("Evaluating Hessian")
 get.hessian <- function(P) return(cl$get.hessian.sparse(P))
 
 
@@ -109,11 +114,11 @@ sol <- relist(post.mode, skeleton=start.list)
 run.par <- TRUE
 if(run.par) registerDoParallel(cores=12) else registerDoParallel(cores=1)
 
-n.draws <- 3
-batch.size <- 1
+n.draws <- 120
+batch.size <- 10
 
-sc <- .94
-M <- 20000
+sc <- 1 / 1.14
+M <- 50000
 
 log.c1 <- get.f(post.mode)
 
@@ -128,7 +133,7 @@ log.const <- log.c1 - log.c2
 cat("Collecting GDS Proposal Draws\n")
 
 draws.m <- as(rmvn.sparse.wrap(M,prop.params),"matrix")
-log.post.m <- plyr::aaply(draws.m, 1,get.f, .parallel=TRUE)
+log.post.m <- plyr::aaply(draws.m, 1,get.f, .parallel=run.par)
 log.prop.m <- dmvn.sparse.wrap(draws.m,params=prop.params)
 log.phi <- log.post.m - log.prop.m +log.c2 - log.c1
 

@@ -1,7 +1,6 @@
 #ifndef __CHEESE
 #define __CHEESE
 
-
 #define LOG_PI 1.1447298858494001639 // log(pi)
 
 #include <mb_base.h>
@@ -24,12 +23,6 @@ using Eigen::Map;
 using Eigen::VectorXi;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
-
-
-template<typename T>
-bool my_finite(const T& x) {
-  return( (abs(x) <= __DBL_MAX__ ) && ( x == x ) );
-}
 
 
 class cheese  {
@@ -74,8 +67,6 @@ class cheese  {
   template<typename Tpars>
     void unwrap_params(const MatrixBase<Tpars>&);
 
-  int get_nvars();
-  int nvars; 
   
   // data and priors.
 
@@ -108,12 +99,14 @@ class cheese  {
 cheese::cheese(const List& params)
 {
 
+  Rcpp::Rcout << "Starting constructor\n";
   List & pars = static_cast<List &>(const_cast<List &>(params));
 
+  Rcpp::Rcout << "Loading\n";
   List data = as<List>(pars["data"]);
   List priors = as<List>(pars["priors"]);
 
-  // Map R to Rcpp
+  Rcpp::Rcout << "Map R to Rcpp\n";
   NumericMatrix volume_((SEXP)data["volume"]);
   NumericMatrix log_price_((SEXP)data["log_price"]);
   NumericMatrix disp_((SEXP)data["disp"]);
@@ -129,7 +122,7 @@ cheese::cheese(const List& params)
   k = mu_prior_mean_.size();
   maxT = volume_.nrow();
 
-  // Map Rcpp to Eigen Scalar
+  Rcpp::Rcout << "Map Rcpp to Eigen Scalar\n";
   Map<MatrixXd> log_price_d = MatrixXd::Map(log_price_.begin(),maxT,N);
   Map<MatrixXd> disp_d = MatrixXd::Map(disp_.begin(),maxT,N);
   Map<MatrixXd> volume_d = MatrixXd::Map(volume_.begin(),maxT,N);
@@ -139,7 +132,7 @@ cheese::cheese(const List& params)
   Map<MatrixXd> chol_Ad = MatrixXd::Map(chol_A_.begin(),k,k);
   T = VectorXi::Map(T_.begin(),N);
 
-  // copy Eigen Scalar Map to Eigen AScalar objects
+  Rcpp::Rcout << "copy Eigen Scalar Map to Eigen AScalar objects\n";
   volume = volume_d.cast<AScalar>();
   log_price = log_price_d.cast<AScalar>();
   disp = disp_d.cast<AScalar>();
@@ -152,7 +145,7 @@ cheese::cheese(const List& params)
   chol_A = chol_Ad.cast<AScalar>();
 
 
-  // reserve space for parameters
+  Rcpp::Rcout << "Reserve space for parameters\n";
   chol_G.resize(k,k);
   B.resize(k,N);
   mu.resize(k);
@@ -233,7 +226,7 @@ void cheese::eval_LLi(const MatrixBase<TL>& LLi_)
     LLit.array() = ri.array()*log_alpha(i)-lgamma_ri.array();
     LLit.array() +=  (ri.array()-AScalar(1.))*log_volume.col(i).head(ti).array() - alpha(i)*volume.col(i).head(ti).array();
     LLi(i) = LLit.sum();
-     assert(my_finite(LLi(i)));
+
   }
 
 }
@@ -243,7 +236,6 @@ void cheese::eval_LLi(const MatrixBase<TL>& LLi_)
 
 AScalar cheese::eval_LL()
 { 
-
   VectorXA LLi(N); //vector to store individual-level likelihoods
   eval_LLi(LLi);
   AScalar LL = LLi.sum();
@@ -280,7 +272,7 @@ AScalar cheese::eval_prior() {
   log_prior_i += log_alpha;
 
   AScalar log_prior = log_prior_i.sum();
-  assert(my_finite(log_prior));
+
   return(log_prior);
 }
 
@@ -298,7 +290,7 @@ AScalar cheese::eval_hyperprior() {
   }
  
   AScalar res = mu_prior(0,0) + G_prior + logJacG;
-  assert(my_finite(res));  
+
 
   return(res);
 
