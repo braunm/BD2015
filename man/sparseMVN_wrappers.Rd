@@ -4,6 +4,7 @@
 \alias{dmvn.sparse.wrap}
 \alias{rmvn.sparse.wrap}
 \alias{sparseMVN_wrappers}
+\title{sparseMVN wrappers}
 \usage{
 rmvn.sparse.wrap(n.draws, params)
 
@@ -12,7 +13,6 @@ dmvn.sparse.wrap(d, params)
 \arguments{
   \item{n.draws}{Number of draws} \item{params}{parameter
   list} \item{d}{Values at which to evaluate density}
-  \item{params}{parameter list}
 }
 \value{
 random MVN samples MVN densities

@@ -1,5 +1,7 @@
-
-
+#' @title True marginal likelihood for MVT example
+#' @param data data
+#' @param hyps hyperpriors
+#' @export
 get.marg.LL <- function(data, hyps) {
 
   b0 <- hyps$b0
@@ -13,6 +15,7 @@ get.marg.LL <- function(data, hyps) {
   x <- data$X
   n <- length(y)
   xtx <- tcrossprod(x)
+  k <- NROW(x)+1
 
   yxb <- y - b0 %*% x
 

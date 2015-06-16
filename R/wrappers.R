@@ -1,4 +1,5 @@
 #' @name sparseMVN_wrappers
+#' @title sparseMVN wrappers
 #' @description wrapper to sparseMVN package
 #' @param n.draws Number of draws
 #' @param params parameter list
@@ -8,10 +9,10 @@ rmvn.sparse.wrap <- function(n.draws, params) {
   return(res)
 }
 
-#' @rdname sparseMVN_wrappers
+
 #' @param d Values at which to evaluate density
-#' @param params parameter list
 #' @return MVN densities
+#' @rdname sparseMVN_wrappers
 dmvn.sparse.wrap <- function(d, params) {
   res <- sparseMVN::dmvn.sparse(d, params$mean, params$CH, prec=TRUE)
   return(res)
